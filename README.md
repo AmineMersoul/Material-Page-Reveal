@@ -1,8 +1,6 @@
-# material_page_reveal
+# Material Page Reveal
 
-A new Flutter project.
+In this Flutter Challenge I attempt to recreate the following design:
+[original design](https://github.com/Ramotion/paper-onboarding-android).
 
-## Getting Started
-
-For help getting started with Flutter, view our online
-[documentation](https://flutter.io/).
+The design features an onboarding flow where each page transitions with a material-design-style reveal.  And the pager indicator at the bottom of the screen moves with the user's finger.
