@@ -47,7 +47,7 @@ class _MyHomePageState extends State<MyHomePage> {
             viewModel: PagerIndicatorViewModel(
               pages,
               1,
-              SlideDirection.none,
+              SlideDirection.leftToRight,
               0.0
             ),
           ),

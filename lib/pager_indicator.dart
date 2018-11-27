@@ -18,13 +18,27 @@ class PagerIndicator extends StatelessWidget {
     List<PageBubble> bubbles = [];
     for (var i = 0; i < viewModel.pages.length; i++){
       final page = viewModel.pages[i];
+
+      double percentActive;
+      if (i == viewModel.activeIndex) {
+        percentActive = 1.0 - viewModel.slidePercent; 
+      } else if (i == viewModel.activeIndex - 1 && viewModel.slideDirection == SlideDirection.leftToRight) {
+        percentActive = viewModel.slidePercent;
+      } else if (i == viewModel.activeIndex + 1 && viewModel.slideDirection == SlideDirection.rightToLeft) {
+        percentActive = viewModel.slidePercent;
+      } else {
+        percentActive = 0.0;
+      }
+
+      bool isHellow = i > viewModel.activeIndex || (i == viewModel.activeIndex && viewModel.slideDirection == SlideDirection.leftToRight);
+
       bubbles.add(
         PageBubble(
           viewModel: PageBubbleViewModel(
             page.iconAssetPath,
             page.color,
-            i > viewModel.activeIndex,
-            i == viewModel.activeIndex ? 1.0 : 0.0,
+            isHellow,
+            percentActive,
           )
         )
       );
@@ -80,11 +94,11 @@ class PageBubble extends StatelessWidget {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: viewModel.isHollow 
-          ? Colors.transparent
+          ? const Color(0x88FFFFFF).withAlpha((0x88 * viewModel.activePercent).round())
           : const Color(0x88FFFFFF),
           border: Border.all(
             color: viewModel.isHollow
-            ? const Color(0x88FFFFFF)
+            ? const Color(0x88FFFFFF).withAlpha((0x88 * (1.0 - viewModel.activePercent)).round())
             : Colors.transparent,
             width: 3.0
           )
