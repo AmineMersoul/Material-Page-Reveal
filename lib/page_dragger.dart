@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:material_page_reveal/pager_indicator.dart';
@@ -68,9 +69,73 @@ class _PageDraggerState extends State<PageDragger> {
   }
 }
 
+class AnimatedPageDragger {
+
+  static const PERCENT_PER_MILLISECOND = 0.005;
+
+  final slideDirection;
+  final transitionGoal;
+
+  AnimationController completionAnimationController;
+
+  AnimatedPageDragger({
+    this.slideDirection,
+    this.transitionGoal,
+    slidePercent,
+    StreamController<SlideUpdate> slideUpdateStream,
+    TickerProvider vsync,
+  }) {
+    final startSlidePercent = slidePercent;
+    var endSlidePercent;
+    var duration;
+
+    if (transitionGoal == TransitionGola.open) {
+      endSlidePercent = 1.0;
+      final slideRemaining = 1.0 - slidePercent;
+      duration = Duration(microseconds: (slideRemaining / PERCENT_PER_MILLISECOND).round());
+    } else {
+      endSlidePercent = 0.0;
+      duration = Duration(microseconds: (slidePercent / PERCENT_PER_MILLISECOND).round());
+    }
+
+    completionAnimationController = AnimationController(
+      duration: duration,
+      vsync: vsync
+    )
+    ..addListener(() {
+      slidePercent = lerpDouble(startSlidePercent, endSlidePercent, completionAnimationController.value);
+      slideUpdateStream.add(
+        SlideUpdate(UpdateType.animating , slideDirection, slidePercent)
+      );
+    })
+    ..addStatusListener((AnimationStatus status) {
+      if (status == AnimationStatus.completed) {
+         slideUpdateStream.add(
+           SlideUpdate(UpdateType.doneAnimating, slideDirection, endSlidePercent)
+         );
+      }
+    });
+  }
+
+  run() {
+    completionAnimationController.forward(from: 0.0);
+  }
+
+  dispose() {
+    completionAnimationController.dispose();
+  }
+}
+
+enum TransitionGola {
+  open,
+  close,
+}
+
 enum UpdateType {
   dragging,
   doneDragging,
+  animating,
+  doneAnimating,
 }
 
 class SlideUpdate {
